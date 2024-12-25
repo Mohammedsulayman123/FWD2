@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Feeding India</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <script>
+        // Check authentication before page loads
+        if (!sessionStorage.getItem('currentUser')) {
+            window.location.href = 'login.html';
+        }
+        const user = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (user.type !== 'ngo') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">Feeding India</div>
+            <nav>
+                <a href="ngo-dashboard.html">Available Donations</a>
+                <a href="claimed-donations.html">Claimed Donations</a>
+                <a href="history.html" class="active">History</a>
+                <a href="#profile">Profile</a>
+                <a href="login.html" class="logout">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1>History</h1>
+            </header>
+
+            <div class="history-grid">
+                <!-- Load and display history data here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function loadHistory() {
+            const historyGrid = document.querySelector('.history-grid');
+            const historyData = JSON.parse(localStorage.getItem('historyData')) || [];
+
+            if (historyData.length === 0) {
+                historyGrid.innerHTML = '<p>No history available.</p>';
+                return;
+            }
+
+            historyGrid.innerHTML = historyData.map(item => `
+                <div class="history-card">
+                    <h3>${item.action}</h3>
+                    <p><strong>Date:</strong> ${new Date(item.date).toLocaleString()}</p>
+                    <p><strong>Details:</strong> ${item.details}</p>
+                </div>
+            `).join('');
+        }
+
+        // Load history when page loads
+        document.addEventListener('DOMContentLoaded', loadHistory);
+    </script>
+</body>
+</html> 

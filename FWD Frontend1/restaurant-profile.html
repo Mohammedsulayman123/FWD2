@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Profile - Feeding India</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <style>
+        body {
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* Light text */
+            font-family: Arial, sans-serif;
+        }
+
+        .dashboard-layout {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #1e1e1e; /* Sidebar background */
+            padding: 20px;
+        }
+
+        .sidebar .logo {
+            color: #dc3545; /* Red color for the logo */
+            font-size: 24px; /* Logo font size */
+            margin-bottom: 20px; /* Space below logo */
+        }
+
+        .sidebar a {
+            color: #ffffff; /* Sidebar link color */
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+        }
+
+        .sidebar a.active {
+            background-color: #dc3545; /* Active link color */
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px; /* Space below heading */
+        }
+
+        .profile-info {
+            background-color: #2a2a2a; /* Profile background */
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .profile-info p {
+            margin: 10px 0; /* Space between paragraphs */
+        }
+
+        .label-red {
+            color: #dc3545; /* Red color for labels */
+        }
+
+        .btn {
+            padding: 10px 15px; /* Button padding */
+            border: none; /* Remove border */
+            border-radius: 4px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+        }
+
+        .btn-primary {
+            background-color: #28a745; /* Green background */
+            color: white; /* White text */
+        }
+
+        .btn-secondary {
+            background-color: #dc3545; /* Red background */
+            color: white; /* White text */
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* Center the modal */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%; /* Responsive width */
+            max-width: 500px; /* Max width for larger screens */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+        }
+
+        .form-group {
+            margin-bottom: 15px; /* Space between form groups */
+        }
+
+        .form-label {
+            display: block; /* Make label a block element */
+            margin-bottom: 5px; /* Space between label and input */
+            font-weight: bold; /* Bold text for labels */
+        }
+
+        .form-control {
+            width: 100%; /* Full width */
+            padding: 10px; /* Padding for inputs */
+            border: 1px solid #ccc; /* Border for inputs */
+            border-radius: 4px; /* Rounded corners */
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <div class="sidebar">
+            <div class="logo">Feeding India</div>
+            <nav>
+                <a href="restaurant-dashboard.html">Dashboard</a>
+                <a href="my-donations.html">My Donations</a>
+                <a href="restaurant-profile.html" class="active">Profile</a>
+                <a href="#" id="logoutButton">Logout</a>
+            </nav>
+        </div>
+        <div class="main-content">
+            <h1>Restaurant Profile</h1>
+            <div class="profile-info">
+                <p><span class="label-red">Name:</span> <span id="restaurantName">Restaurant Name</span></p>
+                <p><span class="label-red">Address:</span> <span id="restaurantAddress">123 Food Street, City, State, ZIP</span></p>
+                <p><span class="label-red">Contact:</span> <span id="restaurantContact">(123) 456-7890</span></p>
+                <p><span class="label-red">Email:</span> <span id="restaurantEmail">restaurant@example.com</span></p>
+                <p><span class="label-red">Description:</span> <span id="restaurantDescription">A brief description of the restaurant and its mission.</span></p>
+            </div>
+            <button class="btn btn-primary" onclick="openEditModal()">Edit Profile</button>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Profile</h2>
+            <div class="form-group">
+                <label for="editName" class="form-label">Name</label>
+                <input type="text" id="editName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="editAddress" class="form-label">Address</label>
+                <input type="text" id="editAddress" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="editContact" class="form-label">Contact</label>
+                <input type="text" id="editContact" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="editEmail" class="form-label">Email</label>
+                <input type="email" id="editEmail" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="editDescription" class="form-label">Description</label>
+                <textarea id="editDescription" class="form-control"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+            <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Load profile data from local storage
+        function loadProfile() {
+            const profileData = JSON.parse(localStorage.getItem('restaurantProfile')) || {
+                name: 'Restaurant Name',
+                address: '123 Food Street, City, State, ZIP',
+                contact: '(123) 456-7890',
+                email: 'restaurant@example.com',
+                description: 'A brief description of the restaurant and its mission.'
+            };
+
+            document.getElementById('restaurantName').innerText = profileData.name;
+            document.getElementById('restaurantAddress').innerText = profileData.address;
+            document.getElementById('restaurantContact').innerText = profileData.contact;
+            document.getElementById('restaurantEmail').innerText = profileData.email;
+            document.getElementById('restaurantDescription').innerText = profileData.description;
+        }
+
+        function openEditModal() {
+            // Populate the modal with current profile data
+            document.getElementById('editName').value = document.getElementById('restaurantName').innerText;
+            document.getElementById('editAddress').value = document.getElementById('restaurantAddress').innerText;
+            document.getElementById('editContact').value = document.getElementById('restaurantContact').innerText;
+            document.getElementById('editEmail').value = document.getElementById('restaurantEmail').innerText;
+            document.getElementById('editDescription').value = document.getElementById('restaurantDescription').innerText;
+
+            // Show the modal
+            document.getElementById('editProfileModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editProfileModal').style.display = 'none';
+        }
+
+        function saveProfile() {
+            // Get values from the modal inputs
+            const name = document.getElementById('editName').value;
+            const address = document.getElementById('editAddress').value;
+            const contact = document.getElementById('editContact').value;
+            const email = document.getElementById('editEmail').value;
+            const description = document.getElementById('editDescription').value;
+
+            // Update the profile info on the page
+            document.getElementById('restaurantName').innerText = name;
+            document.getElementById('restaurantAddress').innerText = address;
+            document.getElementById('restaurantContact').innerText = contact;
+            document.getElementById('restaurantEmail').innerText = email;
+            document.getElementById('restaurantDescription').innerText = description;
+
+            // Save the updated profile data to local storage
+            const profileData = { name, address, contact, email, description };
+            localStorage.setItem('restaurantProfile', JSON.stringify(profileData));
+
+            // Close the modal
+            closeEditModal();
+        }
+
+        // Logout functionality
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            // Clear session storage
+            sessionStorage.removeItem('currentUser');
+            // Redirect to login page
+            window.location.href = 'login.html';
+        });
+
+        // Load profile data when the page loads
+        window.onload = loadProfile;
+    </script>
+</body>
+</html> 

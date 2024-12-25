@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Feeding India</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .dashboard-layout {
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #1e1e1e;
+            padding: 20px;
+        }
+        .sidebar .logo {
+            font-size: 24px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        .sidebar nav a {
+            display: block;
+            padding: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .sidebar nav a:hover {
+            background-color: #dc3545;
+        }
+        .sidebar nav a.active {
+            background-color: #dc3545;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .profile-content {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        .profile-content h2 {
+            margin-bottom: 20px;
+            color: #dc3545;
+        }
+        .profile-content p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .profile-info strong {
+            color: #dc3545;
+        }
+    </style>
+    <script>
+        // Check authentication before page loads
+        if (!sessionStorage.getItem('currentUser')) {
+            window.location.href = 'login.html';
+        }
+
+        // Directly assign user from sessionStorage
+        const user = JSON.parse(sessionStorage.getItem('currentUser'));
+
+        // Ensure user type is valid
+        if (user.type !== 'ngo') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">Feeding India</div>
+            <nav>
+                <a href="ngo-dashboard.html">Available Donations</a>
+                <a href="claimed-donations.html">Claimed Donations</a>
+                <a href="history.html">History</a>
+                <a href="profile.html" class="active">Profile</a>
+                <a href="login.html" class="logout">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1>User Profile</h1>
+            </header>
+
+            <div class="profile-content">
+                <h2>Profile Information</h2>
+                <div class="profile-info">
+                    <p><strong>Organization Name:</strong> <span id="userOrganization"></span></p>
+                    <p><strong>Email:</strong> <span id="userEmail" class="email"></span></p>
+                    <p><strong>Type:</strong> <span id="userType"></span></p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Load user information into the profile
+        document.getElementById('userOrganization').textContent = user.organization || 'N/A';
+        document.getElementById('userEmail').textContent = user.email || 'N/A';
+        document.getElementById('userType').textContent = user.type || 'N/A';
+    </script>
+</body>
+</html> 

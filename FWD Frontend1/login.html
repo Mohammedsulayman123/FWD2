@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Feeding India</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/login.css">
+    <style>
+        body {
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* Light text */
+            font-family: 'Inter', sans-serif; /* Font from Google Fonts */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            margin: 0; /* Remove default margin */
+        }
+
+        .login-container {
+            text-align: center; /* Center text */
+        }
+
+        .login-card {
+            background-color: #1e1e1e; /* Card background */
+            padding: 30px; /* Increased padding for a better look */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+            width: 100%; /* Full width */
+            max-width: 400px; /* Max width for larger screens */
+        }
+
+        .login-button {
+            background-color: #dc3545; /* Red background for button */
+            color: white; /* White text */
+            border: none; /* Remove border */
+            padding: 10px 20px; /* Button padding */
+            border-radius: 4px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            width: 100%; /* Full width */
+            font-size: 16px; /* Increased font size */
+        }
+
+        .signup-link {
+            margin-top: 10px; /* Space above signup link */
+            color: #ffffff; /* White text for signup link */
+        }
+
+        .signup-link a {
+            color: #dc3545; /* Red color for the link */
+            text-decoration: none; /* Remove underline */
+        }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <h1>Login</h1>
+        <form id="loginForm">
+          <input 
+            type="text" 
+            id="orgId" 
+            placeholder="Organization ID (e.g., NGO1234 or REST1234)" 
+            required 
+          />
+          <input 
+            type="password" 
+            id="password" 
+            placeholder="Password" 
+            required 
+          />
+          <button type="submit" class="login-button">Login</button>
+        </form>
+        <div class="signup-link">
+          Don't have an account? <a href="signup.html">Sign up here</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const orgId = document.getElementById('orgId').value.toUpperCase();
+        const password = document.getElementById('password').value;
+
+        // Get stored users
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.orgId === orgId && u.password === password);
+
+        if (user) {
+          // Store logged in user info in sessionStorage
+          sessionStorage.setItem('currentUser', JSON.stringify({
+            orgId: user.orgId,
+            name: user.name,
+            type: user.type
+          }));
+
+          // Redirect based on user type
+          if (user.type === 'ngo') {
+            window.location.href = 'ngo-dashboard.html';
+          } else if (user.type === 'restaurant') {
+            window.location.href = 'restaurant-dashboard.html';
+          }
+        } else {
+          alert('Invalid Organization ID or password');
+        }
+      });
+    </script>
+  </body>
+</html>

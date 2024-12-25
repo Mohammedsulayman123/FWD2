@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claimed Donations - Feeding India</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <script>
+        // Check authentication before page loads
+        if (!sessionStorage.getItem('currentUser')) {
+            window.location.href = 'login.html';
+        }
+        const user = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (user.type !== 'ngo') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">Feeding India</div>
+            <nav>
+                <a href="ngo-dashboard.html" class="nav-link">Available Donations</a>
+                <a href="claimed-donations.html" class="nav-link">Claimed Donations</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="login.html" class="logout">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1>Claimed Donations</h1>
+            </header>
+
+            <div class="donations-grid">
+                <!-- Claimed donations will be loaded here -->
+            </div>
+
+            <script>
+                function loadClaimedDonations() {
+                    const donationsGrid = document.querySelector('.donations-grid');
+                    const claimedDonations = JSON.parse(localStorage.getItem('claimedDonations')) || [];
+
+                    if (claimedDonations.length === 0) {
+                        donationsGrid.innerHTML = '<p>No claimed donations yet.</p>';
+                        return;
+                    }
+
+                    donationsGrid.innerHTML = claimedDonations.map(donation => `
+                        <div class="donation-card" data-donation-id="${donation.id}">
+                            <div class="donation-header">
+                                <h3>${donation.foodType}</h3>
+                                <span class="status-badge status-${donation.status}">${donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}</span>
+                            </div>
+                            <div class="donation-details">
+                                <p><strong>Restaurant:</strong> ${donation.restaurant}</p>
+                                <p><strong>Claimed Time:</strong> ${new Date(donation.claimedTime).toLocaleString()}</p>
+                                <p><strong>Location:</strong> ${donation.location}</p>
+                                <p><strong>Pickup Before:</strong> ${new Date(new Date(donation.claimedTime).getTime() + 2 * 60 * 60 * 1000).toLocaleString()}</p>
+                                <p><strong>Quantity:</strong> ${donation.quantity}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Load donations when page loads
+                document.addEventListener('DOMContentLoaded', loadClaimedDonations);
+            </script>
+        </main>
+    </div>
+</body>
+</html> 

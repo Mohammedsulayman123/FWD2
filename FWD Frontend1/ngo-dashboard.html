@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGO Dashboard - Feeding India</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <script>
+        // Check authentication before page loads
+        if (!sessionStorage.getItem('currentUser')) {
+            window.location.href = 'login.html';
+        }
+        const user = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (user.type !== 'ngo') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">Feeding India</div>
+            <nav>
+                <a href="ngo-dashboard.html" class="nav-link">Available Donations</a>
+                <a href="claimed-donations.html" class="nav-link">Claimed Donations</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="login.html" class="logout">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1>Available Donations</h1>
+                <div class="filter-controls">
+                    <input type="text" placeholder="Search by location..." class="search-input" style="padding: 10px;">
+                    <select class="filter-select">
+                        <option>All Food Types</option>
+                        <option>Meals</option>
+                        <option>Groceries</option>
+                        <option>Beverages</option>
+                    </select>
+                </div>
+            </header>
+
+            <!-- Donation Cards Grid -->
+            <div class="donations-grid">
+                <!-- Donation Card Example -->
+                <div class="donation-card" data-donation-id="1">
+                    <div class="donation-header">
+                        <h3>Rice and Curry</h3>
+                        <span class="time-left">2 hours left</span>
+                    </div>
+                    <div class="donation-details">
+                        <p><strong>Restaurant:</strong> Spice Garden</p>
+                        <p><strong>Location:</strong> MG Road, Bangalore</p>
+                        <p><strong>Quantity:</strong> 50 meals</p>
+                        <p><strong>Distance:</strong> 2.5 km away</p>
+                    </div>
+                    <button class="btn btn-primary btn-claim" onclick="claimDonation(this)">Claim Donation</button>
+                </div>
+                <!-- Add more donation cards as needed -->
+            </div>
+
+            <script>
+                function claimDonation(button) {
+                    const card = button.closest('.donation-card');
+                    const donationId = card.dataset.donationId;
+
+                    // Get the donation details
+                    const donation = {
+                        id: donationId,
+                        foodType: card.querySelector('h3').textContent,
+                        restaurant: card.querySelector('p:nth-child(1)').textContent.split(': ')[1] || 'N/A',
+                        location: card.querySelector('p:nth-child(2)').textContent.split(': ')[1],
+                        quantity: card.querySelector('p:nth-child(3)').textContent.split(': ')[1],
+                        claimedTime: new Date().toISOString(),
+                        status: 'claimed'
+                    };
+
+                    // Get existing claimed donations or initialize empty array
+                    let claimedDonations = JSON.parse(localStorage.getItem('claimedDonations') || '[]');
+
+                    // Add the new claimed donation
+                    claimedDonations.push(donation);
+
+                    // Save to localStorage
+                    localStorage.setItem('claimedDonations', JSON.stringify(claimedDonations));
+
+                    // Remove the claimed donation from available donations
+                    let donations = JSON.parse(localStorage.getItem('donations')) || [];
+                    donations = donations.filter(d => d.foodType !== donation.foodType || d.quantity !== donation.quantity);
+                    localStorage.setItem('donations', JSON.stringify(donations));
+
+                    // Show success message
+                    alert('Donation claimed successfully!');
+
+                    // Redirect to claimed donations page
+                    window.location.href = 'claimed-donations.html';
+                }
+
+                // Load available donations from local storage
+                function loadAvailableDonations() {
+                    const donationsGrid = document.querySelector('.donations-grid');
+                    const donations = JSON.parse(localStorage.getItem('donations')) || [];
+                    const restaurantProfile = JSON.parse(localStorage.getItem('restaurantProfile')) || { name: 'N/A' };
+
+                    donationsGrid.innerHTML = ''; // Clear existing entries
+
+                    donations.forEach(donation => {
+                        const donationCard = document.createElement('div');
+                        donationCard.classList.add('donation-card');
+                        donationCard.setAttribute('data-donation-id', donation.id);
+                        donationCard.innerHTML = `
+                            <div class="donation-header">
+                                <h3>${donation.foodType}</h3>
+                                <span class="time-left">2 hours left</span>
+                            </div>
+                            <div class="donation-details">
+                                <p><strong>Restaurant:</strong> ${restaurantProfile.name}</p>
+                                <p><strong>Location:</strong> ${donation.pickupLocation}</p>
+                                <p><strong>Quantity:</strong> ${donation.quantity} meals</p>
+                                <p><strong>Distance:</strong> 2.5 km away</p>
+                            </div>
+                            <button class="btn btn-primary btn-claim" onclick="claimDonation(this)">Claim Donation</button>
+                        `;
+                        donationsGrid.appendChild(donationCard);
+                    });
+                }
+
+                // Load donations when the page loads
+                window.onload = loadAvailableDonations;
+            </script>
+        </main>
+    </div>
+</body>
+</html> 
